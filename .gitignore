@@ -1,0 +1,47 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.meteor/
+*.lock
+
+# iOS
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/engine/
+ios/Runner.xcworkspace/
+
+# Android
+android/.gradle/
+android/captures/
+android/.idea/
+android/local.properties
+
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Web
+web/.dart_tool/
+
+# Linux
+linux/flutter/
+
+# Windows
+windows/flutter/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+
+# Others
+*.log
+*.tmp
+*.swp
