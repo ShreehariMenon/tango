@@ -10,10 +10,11 @@ class TangoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tango Game',
+      title: '☀️🌙 Tango Puzzle',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Colors.transparent,
         textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
+        fontFamily: 'Roboto',
       ),
       home: const TangoGame(),
     );
@@ -184,10 +185,22 @@ class _TangoGameState extends State<TangoGame> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(solved ? "✅ Correct!" : "❌ Not Yet"),
-        content: Text(solved
-            ? "Great job! You've solved the puzzle."
-            : "Some cells are incorrect or missing."),
+        backgroundColor: solved ? Colors.green[50] : Colors.red[50],
+        title: Text(
+          solved ? "✅ Correct!" : "❌ Not Yet",
+          style: TextStyle(
+            color: solved ? Colors.green[800] : Colors.red[800],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          solved
+              ? "Great job! You've solved the puzzle."
+              : "Some cells are incorrect or missing.",
+          style: TextStyle(
+            color: solved ? Colors.green[700] : Colors.red[700],
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -203,31 +216,34 @@ class _TangoGameState extends State<TangoGame> {
     if (!fixed[row][col] && board[row][col] != '' && board[row][col] != solution[row][col]) {
       textColor = Colors.red;
     } else if (board[row][col] == moon) {
-      textColor = Colors.blue;
+      textColor = Colors.blue[700];
+    } else if (board[row][col] == sun) {
+      textColor = Colors.orange[800];
     } else {
-      textColor = Colors.black;
+      textColor = Colors.black87;
     }
 
     return GestureDetector(
       onTap: () => toggleCell(row, col),
       onLongPress: () => clearCell(row, col),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
-          color: fixed[row][col] ? Colors.grey[200] : Colors.white,
-          border: Border.all(color: Colors.black12),
-          borderRadius: BorderRadius.circular(8),
+          color: fixed[row][col] ? Colors.grey[300] : Colors.white,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: const [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 3,
-              offset: Offset(1, 1),
+              color: Colors.black26,
+              blurRadius: 4,
+              offset: Offset(2, 2),
             ),
           ],
         ),
         alignment: Alignment.center,
         child: Text(
           board[row][col],
-          style: TextStyle(fontSize: 28, color: textColor),
+          style: TextStyle(fontSize: 30, color: textColor),
         ),
       ),
     );
@@ -240,8 +256,8 @@ class _TangoGameState extends State<TangoGame> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(gridSize, (col) {
             return Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: SizedBox(width: 48, height: 48, child: buildCell(row, col)),
+              padding: const EdgeInsets.all(5.0),
+              child: SizedBox(width: 52, height: 52, child: buildCell(row, col)),
             );
           }),
         );
@@ -249,55 +265,100 @@ class _TangoGameState extends State<TangoGame> {
     );
   }
 
+  Widget buildActionButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String label,
+    required Color backgroundColor,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, color: Colors.black87),
+      label: Text(label, style: const TextStyle(color: Colors.black87)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Tango Game', style: TextStyle(color: Colors.black)),
-        centerTitle: true,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xffFDF6EC), Color(0xffFAEEE0)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            buildGrid(),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: undo,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[200]),
-                  child: const Text('Undo', style: TextStyle(color: Colors.black)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.deepOrangeAccent,
+          elevation: 4,
+          title: const Text(
+            '☀️🌙 Tango Puzzle',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              buildGrid(),
+              const Spacer(),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  buildActionButton(
+                    onPressed: undo,
+                    icon: Icons.undo,
+                    label: 'Undo',
+                    backgroundColor: Colors.grey.shade300,
+                  ),
+                  buildActionButton(
+                    onPressed: hint,
+                    icon: Icons.school,
+                    label: 'Teach me',
+                    backgroundColor: Colors.lightBlue.shade100,
+                  ),
+                  buildActionButton(
+                    onPressed: generatePuzzle,
+                    icon: Icons.autorenew,
+                    label: 'New Game',
+                    backgroundColor: Colors.green.shade200,
+                  ),
+                  buildActionButton(
+                    onPressed: clearBoard,
+                    icon: Icons.clear,
+                    label: 'Clear',
+                    backgroundColor: Colors.red.shade200,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: checkSolution,
+                  icon: const Icon(Icons.check_circle_outline, color: Colors.black87),
+                  label: const Text('Check Solution', style: TextStyle(color: Colors.black87)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade200,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: hint,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100]),
-                  child: const Text('Teach me', style: TextStyle(color: Colors.black)),
-                ),
-                ElevatedButton(
-                  onPressed: generatePuzzle,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green[100]),
-                  child: const Text('New Game', style: TextStyle(color: Colors.black)),
-                ),
-                ElevatedButton(
-                  onPressed: clearBoard,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
-                  child: const Text('Clear', style: TextStyle(color: Colors.black)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: checkSolution,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple[100]),
-              child: const Text('Check', style: TextStyle(color: Colors.black)),
-            ),
-            const SizedBox(height: 16),
-          ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
